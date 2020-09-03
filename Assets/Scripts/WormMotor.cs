@@ -9,38 +9,30 @@ public class WormMotor : MonoBehaviour
     public int segments;
     private List<GameObject> seg = new List<GameObject>();
 
-    private float delay = 50f, counter = 0f;
-
     // Start is called before the first frame update
     void Start()
+    {
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+    }
+
+    public void BirthWorm(int x, int y)
     {
         GameObject tempGO;
         for(int i = 0; i < segments; i++)
         {
-            tempGO = Instantiate(wormSegment, new Vector2(transform.position.x + i, transform.position.y), Quaternion.identity, transform);
+            tempGO = Instantiate(wormSegment, new Vector2(x + i, y), Quaternion.identity, transform);
             tempGO.GetComponent<WormSegmentController>().parentObject = this.gameObject;
             tempGO.GetComponent<WormSegmentController>().facing = WormSegmentController.direction.west;
             tempGO.GetComponent<WormSegmentController>().isHead = false; tempGO.GetComponent<WormSegmentController>().isTail = false; //set defualt body image and head/tail setting
             if (i == 0) { tempGO.GetComponent<WormSegmentController>().isHead = true; } //set segment to head
             if (i == (segments - 1)) { tempGO.GetComponent<WormSegmentController>().isTail = true; } //set segment to tail
             seg.Add(tempGO);
-            //Debug.Log("This Object is: " + tempGO.name + ", " + tempGO.tag + " and it belongs to: " + tempGO.GetComponent<WormSegmentController>().parentObject.name + ", " + tempGO.GetComponent<WormSegmentController>().parentObject.tag);
-            //Debug.Log(i + ". " + " Head? " + tempGO.GetComponent<WormSegmentController>().isHead + "  Tail? " + tempGO.GetComponent<WormSegmentController>().isTail);
-            //Debug.Log(i + ". Segment Facing: " + tempGO.GetComponent<WormSegmentController>().facing);
         }
         SetBodySprites();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        counter++;
-        if(counter > delay)
-        {
-            counter = 0;
-            MoveWorm();            
-        }
-        
     }
 
     private void SetBodySprites()
@@ -88,7 +80,7 @@ public class WormMotor : MonoBehaviour
         }
     }
 
-    private void MoveWorm()
+    public void MoveWorm()
     {
         //Determine which direction to move
         int north = 0, south=0, east=0, west=0, randomness=75, way2go = 0, highest = 0, testX = (int)seg[0].transform.position.x, testY = (int)seg[0].transform.position.y;
@@ -121,8 +113,6 @@ public class WormMotor : MonoBehaviour
         if (way2go == 1) { seg[0].GetComponent<WormSegmentController>().facing = WormSegmentController.direction.south; seg[0].transform.position = new Vector2(seg[0].transform.position.x, seg[0].transform.position.y - 1); } //move Seg0 south
         if (way2go == 2) { seg[0].GetComponent<WormSegmentController>().facing = WormSegmentController.direction.east; seg[0].transform.position = new Vector2(seg[0].transform.position.x + 1, seg[0].transform.position.y); } //move Seg0 east
         if (way2go == 3) { seg[0].GetComponent<WormSegmentController>().facing = WormSegmentController.direction.west; seg[0].transform.position = new Vector2(seg[0].transform.position.x - 1, seg[0].transform.position.y); } //move Seg0 west
-
-        //        seg[seg.Count - 1].GetComponent<WormSegmentController>().facing = seg[0].GetComponent<WormSegmentController>().facing;
 
         //determine segment facing
         SetBodySprites();

@@ -14,6 +14,9 @@ public class GameManager : MonoBehaviour
     public GameObject[] grassTrail, colaTree, cherryTree;
     public int mapSize;
 
+
+    private float delay = 50f, counter = 0f;
+
     //Awake
     void Awake()
     {
@@ -77,7 +80,8 @@ public class GameManager : MonoBehaviour
         }
 
         //place Snake
-        bool foundSnakeSpot = false;        
+        bool foundSnakeSpot = false;
+        GameObject snek;
         while (!foundSnakeSpot)
         {
             int snakeX = Random.Range(5, mapSize - 4), snakeY = Random.Range(5, mapSize - 5);
@@ -86,13 +90,31 @@ public class GameManager : MonoBehaviour
             {
                 if (tileAssignment[snakeX+i,snakeY] != 2) foundSnakeSpot = false;
             }
-            //if (foundSnakeSpot) Instantiate(wyrmPrefab, new Vector2(snakeX, snakeY), Quaternion.identity);
+            if (foundSnakeSpot)
+            {
+                snek = Instantiate(wyrmPrefab, new Vector2(0, 0), Quaternion.identity);
+                snek.GetComponent<WormMotor>().BirthWorm(2, 2); //replace 2,2 with snakeX and snakeY
+            }
+            
         }
-        Instantiate(wyrmPrefab, new Vector2(2, 2), Quaternion.identity);
+
+
     }
 
     // Update is called once per frame
     void Update()
     {
+        counter++;
+        if(counter > delay)
+        {
+            counter = 0;
+            PassTurn();
+        }
+    }
+
+    public void PassTurn()
+    {
+        GameObject[] Snakes = GameObject.FindGameObjectsWithTag("Snake");
+        for (int i = 0; i < Snakes.Length; i++) Snakes[i].GetComponent<WormMotor>().MoveWorm();
     }
 }
