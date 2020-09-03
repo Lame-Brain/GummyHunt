@@ -59,5 +59,4 @@ MonoBehaviour:
   tail_West: {fileID: 21300000, guid: c22b0343a8fd2344baec16afbb10a1c9, type: 3}
   wormSegment: {fileID: 71386292251194654, guid: 4c62687a263616b498ca581aabd1bdee,
     type: 3}
-  facing: 0
   segments: 3

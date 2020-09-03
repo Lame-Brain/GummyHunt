@@ -117,4 +117,9 @@ public class WormMotor : MonoBehaviour
         //determine segment facing
         SetBodySprites();
     }
+
+    public Vector2 HeadPos()
+    {
+        return seg[0].transform.position;
+    }
 }

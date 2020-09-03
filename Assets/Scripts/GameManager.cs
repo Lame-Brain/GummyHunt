@@ -5,16 +5,22 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public static GameManager GAME;
-    public GameObject Grass1Prefab, grass2Prefab, grass3Prefab, RockPrefab, ColaPrefab, CherryPrefab, wyrmPrefab;
+    public GameObject GrassPrefab, trailPrefab, RockPrefab, ColaPrefab, CherryPrefab, wyrmPrefab;
+    public Sprite GrassFullGrowth, GrassHalfGrowth, GrassDead;
     [HideInInspector]
     public GameObject[,] tileMap;
-    [HideInInspector]
+    //[HideInInspector]
     public int[,] tileAssignment;
     [HideInInspector]
     public GameObject[] grassTrail, colaTree, cherryTree;
     public int mapSize;
+    public int TrailObjectCache;
 
+    private GameObject[] trail;
+    [SerializeField]
+    private int trailCount = 0;
 
+    //TEST until turn structure is in place
     private float delay = 50f, counter = 0f;
 
     //Awake
@@ -29,6 +35,7 @@ public class GameManager : MonoBehaviour
         //Initialize Arrays
         tileMap = new GameObject[mapSize, mapSize];
         tileAssignment = new int[mapSize, mapSize];
+        trail = new GameObject[TrailObjectCache];
 
         //Set Map Borders
         for(int i = 0; i < mapSize; i++)
@@ -48,7 +55,7 @@ public class GameManager : MonoBehaviour
         {
             for(int x = 1; x < mapSize-1; x++)
             {
-                tileMap[x, y] = Instantiate(Grass1Prefab, new Vector2(x, y), Quaternion.identity);
+                tileMap[x, y] = Instantiate(GrassPrefab, new Vector2(x, y), Quaternion.identity);
                 tileAssignment[x, y] = 2;
             }
         }
@@ -92,12 +99,18 @@ public class GameManager : MonoBehaviour
             }
             if (foundSnakeSpot)
             {
-                snek = Instantiate(wyrmPrefab, new Vector2(0, 0), Quaternion.identity);
+                snek = Instantiate(wyrmPrefab, new Vector2(0, 0), Quaternion.identity);                
                 snek.GetComponent<WormMotor>().BirthWorm(2, 2); //replace 2,2 with snakeX and snakeY
             }
             
         }
 
+        //Fill Trail Cache
+        for(int i = 0; i < TrailObjectCache; i++)
+        {
+            trail[i] = Instantiate(trailPrefab, new Vector2(0, 0), Quaternion.identity);
+            trail[i].GetComponent<SpriteRenderer>().enabled = false;
+        }
 
     }
 
@@ -114,7 +127,36 @@ public class GameManager : MonoBehaviour
 
     public void PassTurn()
     {
+        //Move Gummyworms
         GameObject[] Snakes = GameObject.FindGameObjectsWithTag("Snake");
-        for (int i = 0; i < Snakes.Length; i++) Snakes[i].GetComponent<WormMotor>().MoveWorm();
+        for (int i = 0; i < Snakes.Length; i++)
+        {
+            Snakes[i].GetComponent<WormMotor>().MoveWorm();
+            
+            int x = (int)Snakes[i].GetComponent<WormMotor>().HeadPos().x, y = (int)Snakes[i].GetComponent<WormMotor>().HeadPos().y;
+            if (tileAssignment[x,y] == 2) //GummyWorm is moving over a tile with full growth
+            {
+                tileAssignment[x, y] = 4;
+                trail[trailCount].transform.position = Snakes[i].GetComponent<WormMotor>().HeadPos();
+                trail[trailCount].GetComponent<SpriteRenderer>().sprite = GrassDead;
+                trail[trailCount].GetComponent<SpriteRenderer>().enabled = true;
+                trail[trailCount].GetComponent<TrailControl>().SetActive(true);
+                trailCount++;
+                if (trailCount > (TrailObjectCache - 1)) trailCount = 0;
+            }
+        }
+        //Age Trail objects
+        for(int i = 0; i < TrailObjectCache; i++)
+        {
+            trail[i].GetComponent<TrailControl>().PassTime();
+        }
     }
 }
+
+/*TILE ASSIGNMENT MAP
+ * 1 = Rock Tile
+ * 2 = Grass Tile (full growth)
+ * 3 = PowerUp
+ * 4 = Trail Object (dead grass)
+ * 5 = Trail Object (half-growth)
+ */
