@@ -35,6 +35,26 @@ public class WormMotor : MonoBehaviour
         SetBodySprites();
     }
 
+    public void GrowWorm()
+    {
+        GameObject tempGO; float x = seg[seg.Count - 1].transform.position.x, y = seg[seg.Count - 1].transform.position.y;
+        tempGO = Instantiate(wormSegment, new Vector2(x,y), Quaternion.identity, transform);
+        tempGO.GetComponent<WormSegmentController>().parentObject = this.gameObject;
+        tempGO.GetComponent<WormSegmentController>().facing = seg[seg.Count-1].GetComponent<WormSegmentController>().facing;
+        seg[seg.Count -1].GetComponent<WormSegmentController>().isTail = false;
+        tempGO.GetComponent<WormSegmentController>().isTail = true;
+        seg.Add(tempGO);
+    }
+
+    public void ShrinkWorm()
+    {
+        if(seg.Count > 3)
+        {
+            seg.Remove(seg[seg.Count - 1]);
+            seg[seg.Count - 1].GetComponent<WormSegmentController>().isTail = true;
+        }
+    }
+
     private void SetBodySprites()
     {
         //Head Segment

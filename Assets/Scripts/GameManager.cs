@@ -134,7 +134,7 @@ public class GameManager : MonoBehaviour
             Snakes[i].GetComponent<WormMotor>().MoveWorm();
             
             int x = (int)Snakes[i].GetComponent<WormMotor>().HeadPos().x, y = (int)Snakes[i].GetComponent<WormMotor>().HeadPos().y;
-            if (tileAssignment[x,y] == 2) //GummyWorm is moving over a tile with full growth
+            if (tileAssignment[x,y] == 2 || tileAssignment[x, y] == 3) //GummyWorm is moving over a tile with full growth
             {
                 tileAssignment[x, y] = 4;
                 trail[trailCount].transform.position = Snakes[i].GetComponent<WormMotor>().HeadPos();
@@ -143,6 +143,10 @@ public class GameManager : MonoBehaviour
                 trail[trailCount].GetComponent<TrailControl>().SetActive(true);
                 trailCount++;
                 if (trailCount > (TrailObjectCache - 1)) trailCount = 0;
+                if(tileAssignment[x, y] == 3) //Gummyworm has eaten a powerup
+                {
+
+                }
             }
         }
         //Age Trail objects
