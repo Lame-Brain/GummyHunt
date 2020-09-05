@@ -8,6 +8,7 @@ public class WormSegmentController : MonoBehaviour
     public enum direction { west, north, east, south }
     public direction facing;
     public bool isHead, isTail;
+    public int MyNum;
 
     // Start is called before the first frame update
     void Start()
