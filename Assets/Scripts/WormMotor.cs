@@ -7,17 +7,8 @@ public class WormMotor : MonoBehaviour
     public Sprite head_North, head_South, head_East, head_West, body_NS, body_EW, body_NE, body_NW, body_SE, body_SW, tail_North, tail_South, tail_East, tail_West;
     public GameObject wormSegment;
     public int segments;
+
     private List<GameObject> seg = new List<GameObject>();
-
-    // Start is called before the first frame update
-    void Start()
-    {
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-    }
 
     public void BirthWorm(int x, int y)
     {
@@ -75,32 +66,31 @@ public class WormMotor : MonoBehaviour
 
         for (int i = 1; i < seg.Count-1; i++)
         {
-
+            //local scope helper variables
+            int pX = (int)seg[i - 1].transform.position.x, nX = (int)seg[i + 1].transform.position.x, pY = (int)seg[i - 1].transform.position.y, nY = (int)seg[i + 1].transform.position.y, tX = (int)seg[i].transform.position.x, tY = (int)seg[i].transform.position.y;
             //body_NS, body_EW, body_NE, body_NW, body_SE, body_SW
+            //If both seg-1 and seg+1 are either north or south, then NS            
+            if (pX == tX && nX == tX) seg[i].GetComponent<SpriteRenderer>().sprite = body_NS;
+            //If both seg-1 and seg+1 are either west or east, then EW
+            if (pY == tY && nY == tY) seg[i].GetComponent<SpriteRenderer>().sprite = body_EW;
 
-            if (seg[i - 1].GetComponent<WormSegmentController>().facing == seg[i + 1].GetComponent<WormSegmentController>().facing)
-            {
-                //If both seg-1 and seg+1 are either north or south, then NS
-                if (seg[i - 1].GetComponent<WormSegmentController>().facing == WormSegmentController.direction.north || seg[i - 1].GetComponent<WormSegmentController>().facing == WormSegmentController.direction.south) seg[i].GetComponent<SpriteRenderer>().sprite = body_NS;
-                //If both seg-1 and seg+1 are either west or east, then EW
-                if (seg[i - 1].GetComponent<WormSegmentController>().facing == WormSegmentController.direction.east || seg[i - 1].GetComponent<WormSegmentController>().facing == WormSegmentController.direction.west) seg[i].GetComponent<SpriteRenderer>().sprite = body_EW;
-            }
             //tail is north, head is east
-            if (seg[i + 1].GetComponent<WormSegmentController>().facing == WormSegmentController.direction.south && seg[i - 1].GetComponent<WormSegmentController>().facing == WormSegmentController.direction.east) { seg[i].GetComponent<SpriteRenderer>().sprite = body_NE; }
+            if(nX == tX && nY == tY + 1 && pX == tX + 1 && pY == tY) seg[i].GetComponent<SpriteRenderer>().sprite = body_NE;
             //tail is north, head is west
-            if (seg[i + 1].GetComponent<WormSegmentController>().facing == WormSegmentController.direction.south && seg[i - 1].GetComponent<WormSegmentController>().facing == WormSegmentController.direction.west) { seg[i].GetComponent<SpriteRenderer>().sprite = body_NW; }
+            if (nX == tX && nY == tY + 1 && pX == tX - 1 && pY == tY) seg[i].GetComponent<SpriteRenderer>().sprite = body_NW;
             //tail is south, head is east
-            if (seg[i + 1].GetComponent<WormSegmentController>().facing == WormSegmentController.direction.north && seg[i - 1].GetComponent<WormSegmentController>().facing == WormSegmentController.direction.east) { seg[i].GetComponent<SpriteRenderer>().sprite = body_SE; }
+            if (nX == tX && nY == tY - 1 && pX == tX + 1 && pY == tY) seg[i].GetComponent<SpriteRenderer>().sprite = body_SE;
             //tail is south, head is west
-            if (seg[i + 1].GetComponent<WormSegmentController>().facing == WormSegmentController.direction.north && seg[i - 1].GetComponent<WormSegmentController>().facing == WormSegmentController.direction.west) { seg[i].GetComponent<SpriteRenderer>().sprite = body_SW; }
+            if (nX == tX && nY == tY - 1 && pX == tX - 1 && pY == tY) seg[i].GetComponent<SpriteRenderer>().sprite = body_SW;
+
             //tail is east, head is north
-            if (seg[i + 1].GetComponent<WormSegmentController>().facing == WormSegmentController.direction.west && seg[i - 1].GetComponent<WormSegmentController>().facing == WormSegmentController.direction.north) { seg[i].GetComponent<SpriteRenderer>().sprite = body_NE; }
+            if (nX == tX + 1 && nY == tY && pX == tX && pY == tY + 1) seg[i].GetComponent<SpriteRenderer>().sprite = body_NE;
             //tail is east, head is south
-            if (seg[i + 1].GetComponent<WormSegmentController>().facing == WormSegmentController.direction.west && seg[i - 1].GetComponent<WormSegmentController>().facing == WormSegmentController.direction.south) { seg[i].GetComponent<SpriteRenderer>().sprite = body_SE; }
+            if (nX == tX + 1 && nY == tY && pX == tX && pY == tY - 1) seg[i].GetComponent<SpriteRenderer>().sprite = body_SE;
             //tail is west, head is north
-            if (seg[i + 1].GetComponent<WormSegmentController>().facing == WormSegmentController.direction.east && seg[i - 1].GetComponent<WormSegmentController>().facing == WormSegmentController.direction.north) { seg[i].GetComponent<SpriteRenderer>().sprite = body_NW; }
+            if (nX == tX - 1 && nY == tY && pX == tX && pY == tY + 1) seg[i].GetComponent<SpriteRenderer>().sprite = body_NW;
             //tail is west, head is south
-            if (seg[i + 1].GetComponent<WormSegmentController>().facing == WormSegmentController.direction.east && seg[i - 1].GetComponent<WormSegmentController>().facing == WormSegmentController.direction.south) { seg[i].GetComponent<SpriteRenderer>().sprite = body_SW; }
+            if (nX == tX - 1 && nY == tY && pX == tX && pY == tY - 1) seg[i].GetComponent<SpriteRenderer>().sprite = body_SW;
         }
     }
 
@@ -108,18 +98,26 @@ public class WormMotor : MonoBehaviour
     {
         //Determine which direction to move
         int north = 0, south=0, east=0, west=0, randomness=75, way2go = 0, highest = 0, testX = (int)seg[0].transform.position.x, testY = (int)seg[0].transform.position.y;
+
+        //Worm prefers to move straight, but will also make 90degree turns
         if (seg[0].GetComponent<WormSegmentController>().facing == WormSegmentController.direction.north) { north += 100; east += 50; west += 50; }
         if (seg[0].GetComponent<WormSegmentController>().facing == WormSegmentController.direction.south) { south += 100; east += 50; west += 50; }
         if (seg[0].GetComponent<WormSegmentController>().facing == WormSegmentController.direction.east) { east += 100; north += 50; south += 50; }
         if (seg[0].GetComponent<WormSegmentController>().facing == WormSegmentController.direction.west) { west += 100; north += 50; south += 50; }
+
+        //Worm will not run into rocks
         if (GameManager.GAME.tileAssignment[testX, testY + 1] == 1) { north += -1000; }
         if (GameManager.GAME.tileAssignment[testX, testY - 1] == 1) { south += -1000; }
         if (GameManager.GAME.tileAssignment[testX + 1, testY] == 1) { east += -1000; }
         if (GameManager.GAME.tileAssignment[testX - 1, testY] == 1) { west += -1000; }
+
+        //Add a bit of randomness, for spice
         north += Random.Range(0, randomness);
         south += Random.Range(0, randomness);
         east += Random.Range(0, randomness);
         west += Random.Range(0, randomness);
+               
+        //Find the most desirable outcoume
         highest = 0;
         if (highest < north) { way2go = 0; highest = north; }
         if (highest < south) { way2go = 1; highest = south; }
@@ -128,14 +126,6 @@ public class WormMotor : MonoBehaviour
 
         //Move segments, backwards
         for (int i = seg.Count - 1; i > 0; i--) seg[i].transform.position = seg[i - 1].transform.position;
-        for(int i = 1; i < seg.Count; i++)
-        {
-            if (seg[i-1].transform.position.y == (seg[i].transform.position.y + 1)) seg[i].GetComponent<WormSegmentController>().facing = WormSegmentController.direction.north;
-            if (seg[i-1].transform.position.y == (seg[i].transform.position.y - 1)) seg[i].GetComponent<WormSegmentController>().facing = WormSegmentController.direction.south;
-            if (seg[i-1].transform.position.x == (seg[i].transform.position.x + 1)) seg[i].GetComponent<WormSegmentController>().facing = WormSegmentController.direction.east;
-            if (seg[i-1].transform.position.x == (seg[i].transform.position.x - 1)) seg[i].GetComponent<WormSegmentController>().facing = WormSegmentController.direction.west;
-            //seg[i].GetComponent<WormSegmentController>().facing = seg[i - 1].GetComponent<WormSegmentController>().facing;
-        }
 
         //Move Seg0
         if (way2go == 0) { seg[0].GetComponent<WormSegmentController>().facing = WormSegmentController.direction.north; seg[0].transform.position = new Vector2(seg[0].transform.position.x, seg[0].transform.position.y + 1); } //move Seg0 north
