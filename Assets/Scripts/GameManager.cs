@@ -6,6 +6,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager GAME;
     public GameObject GrassPrefab, trailPrefab, RockPrefab, ColaPrefab, CherryPrefab, wyrmPrefab;
+    public GameObject[] GummyPrefab;
     public Sprite GrassFullGrowth, GrassHalfGrowth, GrassDead;
     [HideInInspector]
     public GameObject[,] tileMap;
@@ -100,7 +101,7 @@ public class GameManager : MonoBehaviour
             if (foundSnakeSpot)
             {
                 snek = Instantiate(wyrmPrefab, new Vector2(0, 0), Quaternion.identity);                
-                snek.GetComponent<WormMotor>().BirthWorm(2, 2); //replace 2,2 with snakeX and snakeY
+                snek.GetComponent<WormMotor>().BirthWorm(snakeX, snakeY); //replace 2,2 with snakeX and snakeY
             }
             
         }
@@ -111,6 +112,9 @@ public class GameManager : MonoBehaviour
             trail[i] = Instantiate(trailPrefab, new Vector2(0, 0), Quaternion.identity);
             trail[i].GetComponent<SpriteRenderer>().enabled = false;
         }
+
+        //place the Gummies
+        Instantiate(GummyPrefab[Random.Range(0, 12)], new Vector2(2, 2),Quaternion.identity);
 
     }
 
