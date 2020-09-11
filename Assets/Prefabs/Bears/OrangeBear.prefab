@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2144562278596487656}
   - component: {fileID: 258231576613589846}
   - component: {fileID: 4919448432872411430}
+  - component: {fileID: -5433265099592861556}
   m_Layer: 0
   m_Name: OrangeBear
   m_TagString: Player
@@ -102,3 +103,32 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &-5433265099592861556
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7104985298925246443}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e50a0784631dc0e41b9e01b3748c8431, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  name: 
+  Strength: 0
+  Accuracy: 0
+  Speed: 0
+  Fortitude: 0
+  ActionPoints: 0
+  HealthPoints: 0
+  Fatigue: 0
+  Wounds: 0
+  ExperiencePoints: 0
+  ExperienceLevel: 0
+  GummyBearPanel: {fileID: 0}
+  BearImage: {fileID: 0}
+  StrengthText: {fileID: 0}
+  AccuracyText: {fileID: 0}
+  SpeedText: {fileID: 0}
+  FortitudeText: {fileID: 0}

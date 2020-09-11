@@ -9,6 +9,7 @@ public class ControlManager : MonoBehaviour
     public GameObject PointerPanel;
     public Text PointerText;
 
+    //private float mouseX, mouseY;
     private int mouseX, mouseY;
 
     // Start is called before the first frame update
@@ -64,7 +65,8 @@ public class ControlManager : MonoBehaviour
 
             //Get mouse coordinates
             Vector3 mousePos = Input.mousePosition;
-            mousePos.z = Camera.main.nearClipPlane;
+//            mousePos.z = Camera.main.nearClipPlane;
+//            mouseX = mousePos.x; mouseY = mousePos.y;
             mouseX = Mathf.RoundToInt(Camera.main.ScreenToWorldPoint(mousePos).x);
             mouseY = Mathf.RoundToInt(Camera.main.ScreenToWorldPoint(mousePos).y);
 
@@ -72,10 +74,16 @@ public class ControlManager : MonoBehaviour
             string output = "";
             if (mouseX > 0 && mouseX < GameManager.GAME.mapSize && mouseY > 0 && mouseY < GameManager.GAME.mapSize)
             {
-                if (GameManager.GAME.tileAssignment[mouseX, mouseY] == 1) output = "ROCK";
-                if (GameManager.GAME.tileAssignment[mouseX, mouseY] == 2 || GameManager.GAME.tileAssignment[mouseX, mouseY] == 4 || GameManager.GAME.tileAssignment[mouseX, mouseY] == 5) output = "GRASS";
-                if (GameManager.GAME.tileAssignment[mouseX, mouseY] == 3) output = "WORM FOOD";
-                if (GameManager.GAME.tileAssignment[mouseX, mouseY] == 6) output = "GUMMY BEAR";
+                if (GameManager.ENTITYMAP[mouseX, mouseY] == 1) output = "GRASS";
+                if (GameManager.ENTITYMAP[mouseX, mouseY] == 2) output = "ROCK";
+                if (GameManager.ENTITYMAP[mouseX, mouseY] == 3) output = "CHERRY";
+                if (GameManager.ENTITYMAP[mouseX, mouseY] == 4) output = "COLA";
+                if (GameManager.ENTITYMAP[mouseX, mouseY] == 5) output = "GUMMYWORM";
+                if (GameManager.ENTITYMAP[mouseX, mouseY] == 6) output = "GUMMYBEAR";
+                //if (GameManager.GAME.tileAssignment[mouseX, mouseY] == 1) output = "ROCK";
+                //if (GameManager.GAME.tileAssignment[mouseX, mouseY] == 2 || GameManager.GAME.tileAssignment[mouseX, mouseY] == 4 || GameManager.GAME.tileAssignment[mouseX, mouseY] == 5) output = "GRASS";
+                //if (GameManager.GAME.tileAssignment[mouseX, mouseY] == 3) output = "WORM FOOD";
+                //if (GameManager.GAME.tileAssignment[mouseX, mouseY] == 6) output = "GUMMY BEAR";
             }
             PointerText.text = output;
         }

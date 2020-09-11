@@ -5,6 +5,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public static GameManager GAME;
+    public static int[,] ENTITYMAP;
     public GameObject GrassPrefab, trailPrefab, RockPrefab, ColaPrefab, CherryPrefab, wyrmPrefab;
     public GameObject[] GummyPrefab;
     public Sprite GrassFullGrowth, GrassHalfGrowth, GrassDead;
@@ -34,6 +35,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         //Initialize Arrays
+        ENTITYMAP = new int[mapSize, mapSize];
         tileMap = new GameObject[mapSize, mapSize];
         tileAssignment = new int[mapSize, mapSize];
         trail = new GameObject[TrailObjectCache];
@@ -116,6 +118,7 @@ public class GameManager : MonoBehaviour
         //place the Gummies
         Instantiate(GummyPrefab[Random.Range(0, 12)], new Vector2(2, 2),Quaternion.identity);
 
+        MakeEntityMap();
     }
 
     // Update is called once per frame
@@ -125,40 +128,75 @@ public class GameManager : MonoBehaviour
         if(counter > delay)
         {
             counter = 0;
-            PassTurn();
+            //PassTurn();
+        }
+    }
+
+    public void MakeEntityMap()
+    {
+        //MAkE ENTITY MAP
+        for (int y = 0; y < mapSize; y++)
+        {
+            for (int x = 0; x < mapSize; x++)
+            {
+                ENTITYMAP[x, y] = 1; //default to grasss
+                if (tileAssignment[x, y] == 1) ENTITYMAP[x, y] = 2; // set rock
+                if (tileAssignment[x, y] == 3)
+                {
+                    if (tileMap[x, y].transform.name == "Cherry(Clone)") ENTITYMAP[x, y] = 3;
+                    if (tileMap[x, y].transform.name == "Cola(Clone)") ENTITYMAP[x, y] = 4;
+                }
+            }
+        }
+        GameObject[] sneks = GameObject.FindGameObjectsWithTag("SnakeSegment");
+        foreach (GameObject a in sneks)
+        {
+            ENTITYMAP[(int)a.transform.position.x, (int)a.transform.position.y] = 5;
+        }
+        GameObject[] bears = GameObject.FindGameObjectsWithTag("Player");
+        foreach (GameObject a in bears)
+        {
+            ENTITYMAP[(int)a.transform.position.x, (int)a.transform.position.y] = 6;
         }
     }
 
     public void PassTurn()
     {
-        //Move Gummyworms
-        GameObject[] Snakes = GameObject.FindGameObjectsWithTag("Snake");
-        for (int i = 0; i < Snakes.Length; i++)
+        if (ControlManager.PLAYERHASCONTROL)
         {
-            Snakes[i].GetComponent<WormMotor>().MoveWorm();
-            
-            int x = (int)Snakes[i].GetComponent<WormMotor>().HeadPos().x, y = (int)Snakes[i].GetComponent<WormMotor>().HeadPos().y;
-            if (tileAssignment[x,y] == 2 || tileAssignment[x, y] == 3) //GummyWorm is moving over a tile with full growth
+            //Move Gummyworms
+            GameObject[] Snakes = GameObject.FindGameObjectsWithTag("Snake");
+            for (int i = 0; i < Snakes.Length; i++)
             {
-                tileAssignment[x, y] = 4;
-                trail[trailCount].transform.position = Snakes[i].GetComponent<WormMotor>().HeadPos();
-                trail[trailCount].GetComponent<SpriteRenderer>().sprite = GrassDead;
-                trail[trailCount].GetComponent<SpriteRenderer>().enabled = true;
-                trail[trailCount].GetComponent<TrailControl>().SetActive(true);
-                trailCount++;
-                if (trailCount > (TrailObjectCache - 1)) trailCount = 0;
-                if(tileAssignment[x, y] == 3) //Gummyworm has eaten a powerup
-                {
+                Snakes[i].GetComponent<WormMotor>().MoveWorm();
 
+                int x = (int)Snakes[i].GetComponent<WormMotor>().HeadPos().x, y = (int)Snakes[i].GetComponent<WormMotor>().HeadPos().y;
+                if (tileAssignment[x, y] == 2 || tileAssignment[x, y] == 3) //GummyWorm is moving over a tile with full growth
+                {
+                    tileAssignment[x, y] = 4;
+                    trail[trailCount].transform.position = Snakes[i].GetComponent<WormMotor>().HeadPos();
+                    trail[trailCount].GetComponent<SpriteRenderer>().sprite = GrassDead;
+                    trail[trailCount].GetComponent<SpriteRenderer>().enabled = true;
+                    trail[trailCount].GetComponent<TrailControl>().SetActive(true);
+                    trailCount++;
+                    if (trailCount > (TrailObjectCache - 1)) trailCount = 0;
+                    if (tileAssignment[x, y] == 3) //Gummyworm has eaten a powerup
+                    {
+
+                    }
                 }
             }
-        }
-        //Age Trail objects
-        for(int i = 0; i < TrailObjectCache; i++)
-        {
-            trail[i].GetComponent<TrailControl>().PassTime();
+            //Age Trail objects
+            for (int i = 0; i < TrailObjectCache; i++)
+            {
+                trail[i].GetComponent<TrailControl>().PassTime();
+            }
+
+            MakeEntityMap();
         }
     }
+
+
 }
 
 /*TILE ASSIGNMENT MAP
@@ -167,4 +205,12 @@ public class GameManager : MonoBehaviour
  * 3 = PowerUp
  * 4 = Trail Object (dead grass)
  * 5 = Trail Object (half-growth)
+ * 
+ * ENTITY MAP
+ * 1 = grass
+ * 2 = rock
+ * 3 = Cherry
+ * 4 = Cola
+ * 5 = Worm
+ * 6 = Gummy
  */
