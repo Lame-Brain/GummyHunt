@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8508117852127425707}
   - component: {fileID: 3709522014476535032}
+  - component: {fileID: 1057213734295576345}
   - component: {fileID: -2930914048392983147}
   - component: {fileID: 1455081176170322138}
   m_Layer: 0
@@ -83,6 +84,32 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!61 &1057213734295576345
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2993248694593863430}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1.06, y: 1.69}
+    newSize: {x: 1.06, y: 1.69}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 1.06, y: 1.69}
+  m_EdgeRadius: 0
 --- !u!95 &-2930914048392983147
 Animator:
   serializedVersion: 3
@@ -114,20 +141,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e50a0784631dc0e41b9e01b3748c8431, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  name: 
-  Strength: 0
-  Accuracy: 0
-  Speed: 0
-  Fortitude: 0
-  ActionPoints: 0
-  HealthPoints: 0
-  Fatigue: 0
-  Wounds: 0
-  ExperiencePoints: 0
-  ExperienceLevel: 0
-  GummyBearPanel: {fileID: 0}
-  BearImage: {fileID: 0}
-  StrengthText: {fileID: 0}
-  AccuracyText: {fileID: 0}
-  SpeedText: {fileID: 0}
-  FortitudeText: {fileID: 0}
+  displayName: COLD STEEL
+  Strength: 10
+  Accuracy: 15
+  Speed: 7
+  Fortitude: 15
+  ActionPoints: 100
+  HealthPoints: 100
+  Fatigue: 13
+  Wounds: 52
+  ExperiencePoints: 100
+  ExperienceLevel: 1
+  weapon: sling
+  armor: vest
+  wepBonus: 2
+  armBonus: 2

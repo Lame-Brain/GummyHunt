@@ -117,6 +117,7 @@ public class GameManager : MonoBehaviour
 
         //place the Gummies
         Instantiate(GummyPrefab[Random.Range(0, 12)], new Vector2(2, 2),Quaternion.identity);
+        Instantiate(GummyPrefab[Random.Range(0, 12)], new Vector2(4, 3), Quaternion.identity);
 
         MakeEntityMap();
     }

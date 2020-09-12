@@ -5,14 +5,11 @@ using UnityEngine.UI;
 
 public class GummyBear : MonoBehaviour
 {
-    public string name;
+    public string displayName;
     public int Strength, Accuracy, Speed, Fortitude, ActionPoints, HealthPoints, Fatigue, Wounds;
     public int ExperiencePoints, ExperienceLevel;
-
-    //Panel Hookups
-    public GameObject GummyBearPanel;
-    public Sprite BearImage;
-    public Text StrengthText, AccuracyText, SpeedText, FortitudeText;
+    public string weapon, armor;
+    public int wepBonus, armBonus;
 
     // Start is called before the first frame update
     void Start()
@@ -24,13 +21,5 @@ public class GummyBear : MonoBehaviour
     void Update()
     {
         
-    }
-
-    public void SelectBear()
-    {
-        ControlManager.PLAYERHASCONTROL = false;
-        if(!GummyBearPanel.activeSelf) GummyBearPanel.SetActive(true);
-        BearImage = transform.GetComponent<SpriteRenderer>().sprite;
-        StrengthText.text = "STRENGTH " + Strength.ToString();
     }
 }
