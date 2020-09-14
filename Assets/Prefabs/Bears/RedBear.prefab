@@ -145,7 +145,7 @@ MonoBehaviour:
   displayName: Red
   Strength: 10
   Accuracy: 15
-  Speed: 7
+  Speed: 3
   Fortitude: 15
   ActionPoints: 100
   HealthPoints: 100

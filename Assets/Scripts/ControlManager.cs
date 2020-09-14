@@ -9,7 +9,8 @@ public class ControlManager : MonoBehaviour
     public GameObject PointerPanel;
     public Text PointerText;
     [HideInInspector]
-    public GameObject Selected;
+    public GameObject Selected, SelectedGO = null, validIco = null, invalidIco = null;
+    public GameObject BracketGO, ValidGO, InvalidGO;
 
     //GummyBear Panel Hookups
     public GameObject GummyBearPanel;
@@ -19,10 +20,15 @@ public class ControlManager : MonoBehaviour
     //private float mouseX, mouseY;
     private int mouseX, mouseY;
 
+    //Modes
+    private bool moveMode = false;
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        Debug.Log("Selected: " + Selected);
+        validIco = Instantiate(ValidGO, new Vector2(-100, -100), Quaternion.identity);
+        invalidIco = Instantiate(InvalidGO, new Vector2(-100, -100), Quaternion.identity);
     }
 
     // Update is called once per frame
@@ -77,7 +83,7 @@ public class ControlManager : MonoBehaviour
             mouseX = Mathf.RoundToInt(Camera.main.ScreenToWorldPoint(mousePos).x);
             mouseY = Mathf.RoundToInt(Camera.main.ScreenToWorldPoint(mousePos).y);
 
-            //output info to Pointer Text
+            //output info to Pointer Text and cursor
             string output = "";
             if (mouseX >= 0 && mouseX < GameManager.GAME.mapSize && mouseY >= 0 && mouseY < GameManager.GAME.mapSize)
             {
@@ -86,17 +92,37 @@ public class ControlManager : MonoBehaviour
                 if (GameManager.ENTITYMAP[mouseX, mouseY] == 3) output = "CHERRY";
                 if (GameManager.ENTITYMAP[mouseX, mouseY] == 4) output = "COLA";
                 if (GameManager.ENTITYMAP[mouseX, mouseY] == 5) output = "GUMMYWORM";
-                if (GameManager.ENTITYMAP[mouseX, mouseY] == 6) output = "GUMMYBEAR";
+                if (GameManager.ENTITYMAP[mouseX, mouseY] == 6) output = "GUMMYBEAR";                
 
+                //Output to Text panel
                 PointerText.text = output;
+
+                //Output to cursor stuff
+                if(moveMode)
+                {
+                    float moveRange = Vector2.Distance(new Vector2(Selected.transform.position.x, Selected.transform.position.y), new Vector2(mouseX, mouseY));
+                    if (GameManager.ENTITYMAP[mouseX, mouseY] != 2 && GameManager.ENTITYMAP[mouseX, mouseY] != 5 && GameManager.ENTITYMAP[mouseX, mouseY] != 6 && moveRange <= Selected.GetComponent<GummyBear>().Speed)
+                    {
+                        validIco.transform.position = new Vector2(mouseX, mouseY);
+                        invalidIco.transform.position = new Vector2(-100, -100);
+                    }
+                    else
+                    {
+                        validIco.transform.position = new Vector2(-100, -100);
+                        invalidIco.transform.position = new Vector2(mouseX, mouseY);
+                    }
+
+                }
 
                 //Click
                 if (Input.GetButtonUp("Fire1") && GameManager.ENTITYMAP[mouseX, mouseY] == 6)
                 {
                     RaycastHit2D hit = Physics2D.Raycast(new Vector2(mouseX, mouseY), Vector2.zero);                    
                     Selected = hit.transform.gameObject;
+                    if (SelectedGO != null) SelectedGO.transform.position = new Vector2(mouseX, mouseY);
+                    if (SelectedGO == null) SelectedGO = Instantiate(BracketGO, new Vector2(mouseX, mouseY), Quaternion.identity);
+                    Debug.Log("Selected: " + Selected);
                     if (!GummyBearPanel.activeSelf) GummyBearPanel.SetActive(true);
-                    PLAYERHASCONTROL = false;
                     BearImage.sprite = Selected.GetComponent<SpriteRenderer>().sprite;
                     NameText.text = Selected.GetComponent<GummyBear>().displayName;
                     LevelText.text = "Level: " + Selected.GetComponent<GummyBear>().ExperienceLevel.ToString();
@@ -108,7 +134,7 @@ public class ControlManager : MonoBehaviour
                     SpeedText.text = "SPEED: " + Selected.GetComponent<GummyBear>().Speed.ToString();
                     FortitudeText.text = "FORT: " + Selected.GetComponent<GummyBear>().Fortitude.ToString();
                     WeaponText.text = Selected.GetComponent<GummyBear>().weapon + "+" + Selected.GetComponent<GummyBear>().wepBonus.ToString();
-                    ArmorText.text = Selected.GetComponent<GummyBear>().armor + "+" + Selected.GetComponent<GummyBear>().armBonus.ToString();
+                    ArmorText.text = Selected.GetComponent<GummyBear>().armor + "+" + Selected.GetComponent<GummyBear>().armBonus.ToString(); 
                 }
             }
         }
@@ -118,4 +144,10 @@ public class ControlManager : MonoBehaviour
     {
         PLAYERHASCONTROL = true;
     }
+
+    public void MoveMode()
+    {
+        moveMode = true;
+    }
+
 }
