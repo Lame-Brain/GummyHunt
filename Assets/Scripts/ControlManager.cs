@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class ControlManager : MonoBehaviour
@@ -21,7 +22,7 @@ public class ControlManager : MonoBehaviour
     private int mouseX, mouseY;
 
     //Modes
-    private bool moveMode = false;
+    private bool moveMode = false, validMove = false; 
 
     // Start is called before the first frame update
     void Start()
@@ -101,21 +102,27 @@ public class ControlManager : MonoBehaviour
                 if(moveMode)
                 {
                     float moveRange = Vector2.Distance(new Vector2(Selected.transform.position.x, Selected.transform.position.y), new Vector2(mouseX, mouseY));
-                    if (GameManager.ENTITYMAP[mouseX, mouseY] != 2 && GameManager.ENTITYMAP[mouseX, mouseY] != 5 && GameManager.ENTITYMAP[mouseX, mouseY] != 6 && moveRange <= Selected.GetComponent<GummyBear>().Speed)
+                    if (GameManager.ENTITYMAP[mouseX, mouseY] != 2 && GameManager.ENTITYMAP[mouseX, mouseY] != 5 && GameManager.ENTITYMAP[mouseX, mouseY] != 6 
+                        && moveRange <= Selected.GetComponent<GummyBear>().Speed && ((moveRange*10)+Selected.GetComponent<GummyBear>().Fatigue) <= Selected.GetComponent<GummyBear>().ActionPoints)
                     {
                         validIco.transform.position = new Vector2(mouseX, mouseY);
                         invalidIco.transform.position = new Vector2(-100, -100);
+                        validMove = true;
                     }
                     else
                     {
                         validIco.transform.position = new Vector2(-100, -100);
                         invalidIco.transform.position = new Vector2(mouseX, mouseY);
+                        validMove = false;
                     }
-
+                }else
+                {
+                    validIco.transform.position = new Vector2(-100, -100);
+                    invalidIco.transform.position = new Vector2(-100, -100);
                 }
 
                 //Click
-                if (Input.GetButtonUp("Fire1") && GameManager.ENTITYMAP[mouseX, mouseY] == 6)
+                if (Input.GetButtonUp("Fire1") && GameManager.ENTITYMAP[mouseX, mouseY] == 6) //Click on Gummy Bear                
                 {
                     RaycastHit2D hit = Physics2D.Raycast(new Vector2(mouseX, mouseY), Vector2.zero);                    
                     Selected = hit.transform.gameObject;
@@ -123,31 +130,67 @@ public class ControlManager : MonoBehaviour
                     if (SelectedGO == null) SelectedGO = Instantiate(BracketGO, new Vector2(mouseX, mouseY), Quaternion.identity);
                     Debug.Log("Selected: " + Selected);
                     if (!GummyBearPanel.activeSelf) GummyBearPanel.SetActive(true);
-                    BearImage.sprite = Selected.GetComponent<SpriteRenderer>().sprite;
-                    NameText.text = Selected.GetComponent<GummyBear>().displayName;
-                    LevelText.text = "Level: " + Selected.GetComponent<GummyBear>().ExperienceLevel.ToString();
-                    XPText.text = "XP: " + Selected.GetComponent<GummyBear>().ExperiencePoints.ToString();
-                    HPText.text = "HP: " + (Selected.GetComponent<GummyBear>().HealthPoints - Selected.GetComponent<GummyBear>().Wounds).ToString() + " / " + Selected.GetComponent<GummyBear>().HealthPoints.ToString();
-                    APText.text = "HP: " + (Selected.GetComponent<GummyBear>().ActionPoints - Selected.GetComponent<GummyBear>().Fatigue).ToString() + " / " + Selected.GetComponent<GummyBear>().ActionPoints.ToString();
-                    StrengthText.text = "STR: " + Selected.GetComponent<GummyBear>().Strength.ToString();
-                    AccuracyText.text = "ACC:  " + Selected.GetComponent<GummyBear>().Accuracy.ToString();
-                    SpeedText.text = "SPEED: " + Selected.GetComponent<GummyBear>().Speed.ToString();
-                    FortitudeText.text = "FORT: " + Selected.GetComponent<GummyBear>().Fortitude.ToString();
-                    WeaponText.text = Selected.GetComponent<GummyBear>().weapon + "+" + Selected.GetComponent<GummyBear>().wepBonus.ToString();
-                    ArmorText.text = Selected.GetComponent<GummyBear>().armor + "+" + Selected.GetComponent<GummyBear>().armBonus.ToString(); 
+                    UpdateGummyPanel();
+                }
+
+                if(Input.GetButtonUp("Fire1") && !moveMode && GameManager.ENTITYMAP[mouseX, mouseY] != 6) //unselect
+                {
+                    Selected = null;
+                    if (GummyBearPanel.activeSelf) GummyBearPanel.SetActive(false);
+                    if (SelectedGO != null) Destroy(SelectedGO);
+                }
+
+                if(Input.GetButtonUp("Fire1") && moveMode && validMove) //click to move to target square
+                {
+                    GameManager.ENTITYMAP[(int)Selected.transform.position.x, (int)Selected.transform.position.y] = 1;
+                    Selected.GetComponent<GummyBear>().Fatigue += (int)Vector2.Distance(new Vector2(Selected.transform.position.x, Selected.transform.position.y), new Vector2(mouseX, mouseY)) * 10;
+                    Selected.transform.parent.position = new Vector2(mouseX, mouseY);
+                    SelectedGO.transform.position = new Vector2(mouseX, mouseY);
+                    GameManager.ENTITYMAP[(int)Selected.transform.position.x, (int)Selected.transform.position.y] = 6;
+                    moveMode = false;
+                    UpdateGummyPanel();
                 }
             }
+            if (Input.GetButtonUp("Fire1") && !EventSystem.current.IsPointerOverGameObject())
+            {
+                if (mouseX < 0 || mouseX >= GameManager.GAME.mapSize || mouseY < 0 || mouseY >= GameManager.GAME.mapSize) //outside bounds, deselect.
+                {
+                    Debug.Log("Out of bounds, deselect!");
+                    Selected = null;
+                    if (GummyBearPanel.activeSelf) GummyBearPanel.SetActive(false);
+                    if (SelectedGO != null) Destroy(SelectedGO);
+                }
+            }
+
         }
+    }
+
+    public void UpdateGummyPanel()
+    {
+        BearImage.sprite = Selected.GetComponent<SpriteRenderer>().sprite;
+        NameText.text = Selected.GetComponent<GummyBear>().displayName;
+        LevelText.text = "Level: " + Selected.GetComponent<GummyBear>().ExperienceLevel.ToString();
+        XPText.text = "XP: " + Selected.GetComponent<GummyBear>().ExperiencePoints.ToString();
+        HPText.text = "HP: " + (Selected.GetComponent<GummyBear>().HealthPoints - Selected.GetComponent<GummyBear>().Wounds).ToString() + " / " + Selected.GetComponent<GummyBear>().HealthPoints.ToString();
+        APText.text = "AP: " + (Selected.GetComponent<GummyBear>().ActionPoints - Selected.GetComponent<GummyBear>().Fatigue).ToString() + " / " + Selected.GetComponent<GummyBear>().ActionPoints.ToString();
+        StrengthText.text = "STR: " + Selected.GetComponent<GummyBear>().Strength.ToString();
+        AccuracyText.text = "ACC:  " + Selected.GetComponent<GummyBear>().Accuracy.ToString();
+        SpeedText.text = "SPEED: " + Selected.GetComponent<GummyBear>().Speed.ToString();
+        FortitudeText.text = "FORT: " + Selected.GetComponent<GummyBear>().Fortitude.ToString();
+        WeaponText.text = Selected.GetComponent<GummyBear>().weapon + "+" + Selected.GetComponent<GummyBear>().wepBonus.ToString();
+        ArmorText.text = Selected.GetComponent<GummyBear>().armor + "+" + Selected.GetComponent<GummyBear>().armBonus.ToString();
     }
 
     public void ReturnControltoPlayer()
     {
         PLAYERHASCONTROL = true;
+        moveMode = false;
+        if (SelectedGO != null) Destroy(SelectedGO);
     }
 
     public void MoveMode()
     {
-        moveMode = true;
+        moveMode = !moveMode;
     }
 
 }

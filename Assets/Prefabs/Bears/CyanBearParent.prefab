@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &8473540436567784063
+--- !u!1 &1587015929299268925
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,39 +8,39 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8347801346421802258}
-  - component: {fileID: 2437527893017335027}
-  - component: {fileID: 744784943415638236}
-  - component: {fileID: 761347873643866876}
-  - component: {fileID: -6339630471632831693}
+  - component: {fileID: 2577222505255767054}
+  - component: {fileID: 1103508605630651263}
+  - component: {fileID: 2212673752718537286}
+  - component: {fileID: 2184674865863002697}
+  - component: {fileID: 439644326446233674}
   m_Layer: 0
-  m_Name: LightBlueBear
+  m_Name: CyanBear
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &8347801346421802258
+--- !u!4 &2577222505255767054
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8473540436567784063}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_GameObject: {fileID: 1587015929299268925}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 2286726583514691244}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &2437527893017335027
+--- !u!212 &1103508605630651263
 SpriteRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8473540436567784063}
+  m_GameObject: {fileID: 1587015929299268925}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -73,7 +73,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 15
-  m_Sprite: {fileID: -4767831657707273873, guid: 29f53c81be24a874b9de8231f72e0ad1,
+  m_Sprite: {fileID: 7004523535649101136, guid: 29f53c81be24a874b9de8231f72e0ad1,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -85,13 +85,13 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!61 &744784943415638236
+--- !u!61 &2212673752718537286
 BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8473540436567784063}
+  m_GameObject: {fileID: 1587015929299268925}
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
@@ -111,14 +111,14 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1.07, y: 1.69}
   m_EdgeRadius: 0
---- !u!95 &761347873643866876
+--- !u!95 &2184674865863002697
 Animator:
   serializedVersion: 3
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8473540436567784063}
+  m_GameObject: {fileID: 1587015929299268925}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 3aa3b3e2501fd9247ac685ce3b5f85d8, type: 2}
@@ -130,26 +130,26 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &-6339630471632831693
+--- !u!114 &439644326446233674
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8473540436567784063}
+  m_GameObject: {fileID: 1587015929299268925}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e50a0784631dc0e41b9e01b3748c8431, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  displayName: Ice
+  displayName: Cyrano
   Strength: 10
   Accuracy: 15
-  Speed: 3
+  Speed: 15
   Fortitude: 15
-  ActionPoints: 100
+  ActionPoints: 30
   HealthPoints: 100
-  Fatigue: 13
+  Fatigue: 0
   Wounds: 52
   ExperiencePoints: 100
   ExperienceLevel: 1
@@ -157,3 +157,34 @@ MonoBehaviour:
   armor: vest
   wepBonus: 2
   armBonus: 2
+--- !u!1 &6829308915553203750
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2286726583514691244}
+  m_Layer: 0
+  m_Name: CyanBearParent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2286726583514691244
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6829308915553203750}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 2577222505255767054}
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

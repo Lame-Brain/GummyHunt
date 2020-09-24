@@ -3,7 +3,16 @@ guid: 39cf51b7b7229bc4794f0ee92ad6dede
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - GrassPrefab: {instanceID: 0}
+  - trailPrefab: {instanceID: 0}
+  - RockPrefab: {instanceID: 0}
+  - ColaPrefab: {instanceID: 0}
+  - CherryPrefab: {instanceID: 0}
+  - wyrmPrefab: {instanceID: 0}
+  - GrassFullGrowth: {instanceID: 0}
+  - GrassHalfGrowth: {instanceID: 0}
+  - GrassDead: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
