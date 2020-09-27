@@ -5,6 +5,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public static GameManager GAME;
+    public static ControlManager CONTROL;
     public static int[,] ENTITYMAP;
     public GameObject GrassPrefab, trailPrefab, RockPrefab, ColaPrefab, CherryPrefab, wyrmPrefab;
     public GameObject[] GummyPrefab;
@@ -29,6 +30,7 @@ public class GameManager : MonoBehaviour
     void Awake()
     {
         GAME = this;
+        CONTROL = GameObject.FindGameObjectWithTag("GameController").GetComponent<ControlManager>();
     }
 
     // Start is called before the first frame update
@@ -103,7 +105,7 @@ public class GameManager : MonoBehaviour
             if (foundSnakeSpot)
             {
                 snek = Instantiate(wyrmPrefab, new Vector2(0, 0), Quaternion.identity);                
-                snek.GetComponent<WormMotor>().BirthWorm(snakeX, snakeY); //replace 2,2 with snakeX and snakeY
+                snek.GetComponent<WormMotor>().BirthWorm(4, 4); //replace 2,2 with snakeX and snakeY <--------------------------------------------------------------------------------------------------
             }
             
         }
@@ -193,6 +195,15 @@ public class GameManager : MonoBehaviour
                 trail[i].GetComponent<TrailControl>().PassTime();
             }
 
+            //Reset Bears
+            GameObject[] bears = GameObject.FindGameObjectsWithTag("Player");
+            foreach (GameObject i in bears)
+            {
+                i.transform.GetComponent<GummyBear>().Fatigue = 0;
+                CONTROL.UnSelect();
+            }
+
+            // Make Entity Map
             MakeEntityMap();
         }
     }

@@ -7,6 +7,7 @@ public class WormMotor : MonoBehaviour
     public Sprite head_North, head_South, head_East, head_West, body_NS, body_EW, body_NE, body_NW, body_SE, body_SW, tail_North, tail_South, tail_East, tail_West;
     public GameObject wormSegment;
     public int segments;
+    public int Health = 100;
 
     private List<GameObject> seg = new List<GameObject>();
 

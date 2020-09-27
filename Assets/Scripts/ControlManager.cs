@@ -10,7 +10,7 @@ public class ControlManager : MonoBehaviour
     public GameObject PointerPanel;
     public Text PointerText;
     [HideInInspector]
-    public GameObject Selected, SelectedGO = null, validIco = null, invalidIco = null;
+    public GameObject Selected, SelectedGO = null, validIco = null, invalidIco = null, target = null;
     public GameObject BracketGO, ValidGO, InvalidGO;
 
     //GummyBear Panel Hookups
@@ -22,7 +22,7 @@ public class ControlManager : MonoBehaviour
     private int mouseX, mouseY;
 
     //Modes
-    private bool moveMode = false, validMove = false; 
+    private bool moveMode = false, attackMode = false, validMove = false, validAttack = false; 
 
     // Start is called before the first frame update
     void Start()
@@ -99,11 +99,11 @@ public class ControlManager : MonoBehaviour
                 PointerText.text = output;
 
                 //Output to cursor stuff
-                if(moveMode)
+                if(moveMode) //For moving
                 {
                     float moveRange = Vector2.Distance(new Vector2(Selected.transform.position.x, Selected.transform.position.y), new Vector2(mouseX, mouseY));
                     if (GameManager.ENTITYMAP[mouseX, mouseY] != 2 && GameManager.ENTITYMAP[mouseX, mouseY] != 5 && GameManager.ENTITYMAP[mouseX, mouseY] != 6 
-                        && moveRange <= Selected.GetComponent<GummyBear>().Speed && ((moveRange*10)+Selected.GetComponent<GummyBear>().Fatigue) <= Selected.GetComponent<GummyBear>().ActionPoints)
+                        && moveRange <= Selected.GetComponent<GummyBear>().Speed && ((moveRange*2)+Selected.GetComponent<GummyBear>().Fatigue) <= Selected.GetComponent<GummyBear>().ActionPoints)
                     {
                         validIco.transform.position = new Vector2(mouseX, mouseY);
                         invalidIco.transform.position = new Vector2(-100, -100);
@@ -115,14 +115,35 @@ public class ControlManager : MonoBehaviour
                         invalidIco.transform.position = new Vector2(mouseX, mouseY);
                         validMove = false;
                     }
-                }else
+                }
+
+                if(attackMode)//for Attacking
+                {
+                    Debug.Log(Selected.transform.position);
+                    Debug.Log(new Vector2(mouseX, mouseY));
+                    Debug.Log(GameManager.ENTITYMAP[mouseX, mouseY]);
+                    float attackRange = Vector2.Distance(new Vector2(Selected.transform.position.x, Selected.transform.position.y), new Vector2(mouseX, mouseY));
+                    if (GameManager.ENTITYMAP[mouseX, mouseY] == 5 && Selected.GetComponent<GummyBear>().Fatigue+2 <= Selected.GetComponent<GummyBear>().ActionPoints) //if square is visible and is a worm
+                    {
+                        validIco.transform.position = new Vector2(mouseX, mouseY);
+                        invalidIco.transform.position = new Vector2(-100, -100);
+                        validAttack = true;
+                    }
+                    else //square is not visible, or does not have a worm
+                    {
+                        validIco.transform.position = new Vector2(-100, -100); 
+                        invalidIco.transform.position = new Vector2(mouseX, mouseY);
+                        validAttack = false;
+                    }
+                }
+                if(!moveMode && !attackMode)
                 {
                     validIco.transform.position = new Vector2(-100, -100);
                     invalidIco.transform.position = new Vector2(-100, -100);
                 }
 
                 //Click
-                if (Input.GetButtonUp("Fire1") && GameManager.ENTITYMAP[mouseX, mouseY] == 6) //Click on Gummy Bear                
+                if (Input.GetButtonUp("Fire1") && GameManager.ENTITYMAP[mouseX, mouseY] == 6 && !EventSystem.current.IsPointerOverGameObject()) //Click on Gummy Bear                
                 {
                     RaycastHit2D hit = Physics2D.Raycast(new Vector2(mouseX, mouseY), Vector2.zero);                    
                     Selected = hit.transform.gameObject;
@@ -133,36 +154,55 @@ public class ControlManager : MonoBehaviour
                     UpdateGummyPanel();
                 }
 
-                if(Input.GetButtonUp("Fire1") && !moveMode && GameManager.ENTITYMAP[mouseX, mouseY] != 6) //unselect
+                if(Input.GetButtonUp("Fire1") && !EventSystem.current.IsPointerOverGameObject() && !moveMode && !attackMode && GameManager.ENTITYMAP[mouseX, mouseY] != 6) //unselect
                 {
-                    Selected = null;
-                    if (GummyBearPanel.activeSelf) GummyBearPanel.SetActive(false);
-                    if (SelectedGO != null) Destroy(SelectedGO);
+                    UnSelect();
                 }
 
-                if(Input.GetButtonUp("Fire1") && moveMode && validMove) //click to move to target square
+                if (Input.GetButtonUp("Fire1") && moveMode && validMove && !EventSystem.current.IsPointerOverGameObject()) //click to move to target square
                 {
                     GameManager.ENTITYMAP[(int)Selected.transform.position.x, (int)Selected.transform.position.y] = 1;
-                    Selected.GetComponent<GummyBear>().Fatigue += (int)Vector2.Distance(new Vector2(Selected.transform.position.x, Selected.transform.position.y), new Vector2(mouseX, mouseY)) * 10;
+                    Selected.GetComponent<GummyBear>().Fatigue += (int)Vector2.Distance(new Vector2(Selected.transform.position.x, Selected.transform.position.y), new Vector2(mouseX, mouseY)) * 2;
                     Selected.transform.parent.position = new Vector2(mouseX, mouseY);
                     SelectedGO.transform.position = new Vector2(mouseX, mouseY);
                     GameManager.ENTITYMAP[(int)Selected.transform.position.x, (int)Selected.transform.position.y] = 6;
                     moveMode = false;
                     UpdateGummyPanel();
                 }
+
+                if (Input.GetButtonUp("Fire1") && attackMode && validAttack && !EventSystem.current.IsPointerOverGameObject()) //click to attack a worm
+                {
+                    Selected.GetComponent<GummyBear>().Fatigue += 2;
+                    attackMode = false;
+                    RaycastHit2D hit = Physics2D.Raycast(new Vector2(mouseX, mouseY), Vector2.zero);
+                    target = hit.transform.gameObject; target.GetComponent<Animator>().SetBool("Hurt", true);
+                    target = target.GetComponent<WormSegmentController>().parentObject;
+                    target.GetComponent<WormMotor>().Health += -10;
+                    if (target.GetComponent<WormMotor>().Health <= 0) Destroy(target);
+                    target = null;
+                    UpdateGummyPanel();
+                }
+
+
             }
             if (Input.GetButtonUp("Fire1") && !EventSystem.current.IsPointerOverGameObject())
             {
                 if (mouseX < 0 || mouseX >= GameManager.GAME.mapSize || mouseY < 0 || mouseY >= GameManager.GAME.mapSize) //outside bounds, deselect.
                 {
-                    Debug.Log("Out of bounds, deselect!");
-                    Selected = null;
-                    if (GummyBearPanel.activeSelf) GummyBearPanel.SetActive(false);
-                    if (SelectedGO != null) Destroy(SelectedGO);
+                    UnSelect();
                 }
             }
 
         }
+    }
+
+    public void UnSelect()
+    {
+        Selected = null;
+        if (GummyBearPanel.activeSelf) GummyBearPanel.SetActive(false);
+        if (SelectedGO != null) Destroy(SelectedGO);
+        moveMode = false;
+        attackMode = false;
     }
 
     public void UpdateGummyPanel()
@@ -177,8 +217,8 @@ public class ControlManager : MonoBehaviour
         AccuracyText.text = "ACC:  " + Selected.GetComponent<GummyBear>().Accuracy.ToString();
         SpeedText.text = "SPEED: " + Selected.GetComponent<GummyBear>().Speed.ToString();
         FortitudeText.text = "FORT: " + Selected.GetComponent<GummyBear>().Fortitude.ToString();
-        WeaponText.text = Selected.GetComponent<GummyBear>().weapon + "+" + Selected.GetComponent<GummyBear>().wepBonus.ToString();
-        ArmorText.text = Selected.GetComponent<GummyBear>().armor + "+" + Selected.GetComponent<GummyBear>().armBonus.ToString();
+        WeaponText.text = Selected.GetComponent<GummyBear>().weapon; // + "+" + Selected.GetComponent<GummyBear>().wepBonus.ToString();
+        ArmorText.text = Selected.GetComponent<GummyBear>().armor; // + "+" + Selected.GetComponent<GummyBear>().armBonus.ToString();
     }
 
     public void ReturnControltoPlayer()
@@ -191,6 +231,10 @@ public class ControlManager : MonoBehaviour
     public void MoveMode()
     {
         moveMode = !moveMode;
+    }
+    public void AttackMode()
+    {
+        attackMode = !attackMode;
     }
 
 }

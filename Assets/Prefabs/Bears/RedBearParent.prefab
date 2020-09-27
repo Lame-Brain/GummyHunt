@@ -174,17 +174,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   displayName: Red
-  Strength: 10
-  Accuracy: 15
-  Speed: 15
-  Fortitude: 15
-  ActionPoints: 30
-  HealthPoints: 100
+  Strength: 5
+  Accuracy: 5
+  Speed: 5
+  Fortitude: 5
+  ActionPoints: 8
+  HealthPoints: 15
   Fatigue: 0
-  Wounds: 52
-  ExperiencePoints: 100
+  Wounds: 0
+  ExperiencePoints: 0
   ExperienceLevel: 1
-  weapon: sling
-  armor: vest
-  wepBonus: 2
-  armBonus: 2
+  weapon: Bow & Arrow
+  armor: Hunting Leathers
+  wepBonus: 0
+  armBonus: 0

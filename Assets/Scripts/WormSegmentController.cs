@@ -10,15 +10,8 @@ public class WormSegmentController : MonoBehaviour
     public bool isHead, isTail;
     public int MyNum;
 
-    // Start is called before the first frame update
-    void Start()
+    public void FixedUpdate()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        this.GetComponent<Animator>().SetBool("Hurt", false);
     }
 }

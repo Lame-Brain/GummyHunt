@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5923513542967976427}
   - component: {fileID: 5923513542967976426}
+  - component: {fileID: 890063209973544556}
   m_Layer: 0
   m_Name: Wyrm
   m_TagString: Snake
@@ -60,3 +61,23 @@ MonoBehaviour:
   wormSegment: {fileID: 71386292251194654, guid: 4c62687a263616b498ca581aabd1bdee,
     type: 3}
   segments: 3
+  Health: 100
+--- !u!95 &890063209973544556
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5923513542967976421}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: a8051143c5c75e644a421ac30e6da9b8, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
