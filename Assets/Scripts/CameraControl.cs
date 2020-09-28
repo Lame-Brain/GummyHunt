@@ -54,4 +54,20 @@ public class CameraControl : MonoBehaviour
     {
         xSpeed = 0;
     }
+
+    public void MoveCamera2Point(int x, int y)
+    {
+        Camera.main.transform.position = new Vector3(x, y, Camera.main.transform.position.z);
+        xSpeed = 0;
+        ySpeed = 0;
+    }
+
+    public void ScrollCameraX(float mag)
+    {
+        xSpeed = mag;
+    }
+    public void ScrollCameraY(float mag)
+    {
+        ySpeed = mag;
+    }
 }

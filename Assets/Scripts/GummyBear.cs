@@ -9,7 +9,7 @@ public class GummyBear : MonoBehaviour
     public int Strength, Accuracy, Speed, Fortitude, ActionPoints, HealthPoints, Fatigue, Wounds;
     public int ExperiencePoints, ExperienceLevel;
     public string weapon, armor;
-    public int wepBonus, armBonus;
+    public int wepBonus, armBonus, number;
 
     // Start is called before the first frame update
     void Start()

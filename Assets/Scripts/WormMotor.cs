@@ -142,4 +142,14 @@ public class WormMotor : MonoBehaviour
     {
         return seg[0].transform.position;
     }
+
+    public void KillWorm()
+    {
+        for(int i = 0; i < seg.Count; i++)
+        {
+            GameManager.ENTITYMAP[(int)seg[i].transform.position.x, (int)seg[i].transform.position.y] = 1;
+        }
+        Destroy(this);
+        GameManager.CONTROL.KilledAGummyWorm();
+    }
 }

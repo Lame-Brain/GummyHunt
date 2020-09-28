@@ -23,8 +23,11 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private int trailCount = 0;
 
+    public int GummyBearIndex;
+    public List<GameObject> GummyBearList;
+
     //TEST until turn structure is in place
-    private float delay = 50f, counter = 0f;
+    //    private float delay = 50f, counter = 0f;
 
     //Awake
     void Awake()
@@ -128,6 +131,7 @@ public class GameManager : MonoBehaviour
         //place the Gummies
         int leaderColor = Random.Range(0, 7), gX = 2, gY = 2;
         bool validSpot;
+        GummyBearIndex = 1;
         for (int n = 0; n < 5; n++)
         {
             validSpot = false;
@@ -139,6 +143,14 @@ public class GameManager : MonoBehaviour
             }
             Instantiate(GummyPrefab[leaderColor + n], new Vector2(gX, gY), Quaternion.identity);
         }
+        //Add Bears to list named "GummyBearList"
+        GameObject[] bears = GameObject.FindGameObjectsWithTag("Player");
+        for (int i = 0; i < bears.Length; i++)
+        {            
+            GummyBearList.Add(bears[i]);
+            bears[i].GetComponent<GummyBear>().number = i;
+        }
+
 
         MakeEntityMap();
         SetVisibleMap();
@@ -147,12 +159,6 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        counter++;
-        if(counter > delay)
-        {
-            counter = 0;
-            //PassTurn();
-        }
     }
 
     public void SetVisibleMap()

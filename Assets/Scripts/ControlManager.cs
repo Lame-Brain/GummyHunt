@@ -13,8 +13,10 @@ public class ControlManager : MonoBehaviour
     public GameObject Selected, SelectedGO = null, validIco = null, invalidIco = null, target = null;
     public GameObject BracketGO, ValidGO, InvalidGO;
 
+    //Screen Hookups
+    public GameObject GummyBearPanel, HelpPanelObject, QuitScreenPanel, KilledTheWormPanel;
+
     //GummyBear Panel Hookups
-    public GameObject GummyBearPanel;
     public Image BearImage;
     public Text NameText, LevelText, XPText, HPText, APText, StrengthText, AccuracyText, SpeedText, FortitudeText, WeaponText, ArmorText;    
 
@@ -27,7 +29,6 @@ public class ControlManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Debug.Log("Selected: " + Selected);
         validIco = Instantiate(ValidGO, new Vector2(-100, -100), Quaternion.identity);
         invalidIco = Instantiate(InvalidGO, new Vector2(-100, -100), Quaternion.identity);
     }
@@ -42,38 +43,57 @@ public class ControlManager : MonoBehaviour
 
         if (PLAYERHASCONTROL)
         {
-            if (Input.GetKeyDown(KeyCode.UpArrow))
+            //Help Screen
+            if (Input.GetKeyUp(KeyCode.F1)) ActivateHelpScreen();
+
+            //Quit Screen
+            if (Input.GetKeyUp(KeyCode.Escape)) ToggleQuitScreen();
+
+            //Camera  Control
+            if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
             {
                 Camera.main.GetComponent<CameraControl>().MoveCameraUp();
             }
-            if (Input.GetKeyUp(KeyCode.UpArrow))
+            if (Input.GetKeyUp(KeyCode.UpArrow) || Input.GetKeyUp(KeyCode.W))
             {
                 Camera.main.GetComponent<CameraControl>().StopCameraUp();
             }
-            if (Input.GetKeyDown(KeyCode.DownArrow))
+            if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
             {
                 Camera.main.GetComponent<CameraControl>().MoveCameraDown();
             }
-            if (Input.GetKeyUp(KeyCode.DownArrow))
+            if (Input.GetKeyUp(KeyCode.DownArrow) || Input.GetKeyUp(KeyCode.S))
             {
                 Camera.main.GetComponent<CameraControl>().StopCameraDown();
             }
-            if (Input.GetKeyDown(KeyCode.LeftArrow))
+            if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
             {
                 Camera.main.GetComponent<CameraControl>().MoveCameraLeft();
             }
-            if (Input.GetKeyUp(KeyCode.LeftArrow))
+            if (Input.GetKeyUp(KeyCode.LeftArrow) || Input.GetKeyUp(KeyCode.A))
             {
                 Camera.main.GetComponent<CameraControl>().StopCameraLeft();
             }
-            if (Input.GetKeyDown(KeyCode.RightArrow))
+            if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
             {
                 Camera.main.GetComponent<CameraControl>().MoveCameraRight();
             }
-            if (Input.GetKeyUp(KeyCode.RightArrow))
+            if (Input.GetKeyUp(KeyCode.RightArrow) || Input.GetKeyUp(KeyCode.D))
             {
                 Camera.main.GetComponent<CameraControl>().StopCameraRight();
             }
+
+            if (Input.GetButton("Fire2"))
+            {
+                float MouseMag = Camera.main.GetComponent<CameraControl>().speed * 2.0f;
+                if (Input.GetAxisRaw("Mouse Y") < 0) Camera.main.GetComponent<CameraControl>().ScrollCameraY(MouseMag); //moving Up?
+                if (Input.GetAxisRaw("Mouse Y") > 0) Camera.main.GetComponent<CameraControl>().ScrollCameraY(-MouseMag); //moving Down?
+                if (Input.GetAxisRaw("Mouse Y") == 0) Camera.main.GetComponent<CameraControl>().ScrollCameraY(0);
+                if (Input.GetAxisRaw("Mouse X") < 0) Camera.main.GetComponent<CameraControl>().ScrollCameraX(MouseMag); //moving Left?
+                if (Input.GetAxisRaw("Mouse X") > 0) Camera.main.GetComponent<CameraControl>().ScrollCameraX(-MouseMag); //moving Right?
+                if (Input.GetAxisRaw("Mouse X") == 0) Camera.main.GetComponent<CameraControl>().ScrollCameraX(0);
+            }
+            if (Input.GetButtonUp("Fire2")) { Camera.main.GetComponent<CameraControl>().ScrollCameraX(0); Camera.main.GetComponent<CameraControl>().ScrollCameraY(0); }
 
             //Set Pointer panel to on, if Player has control
             if (!PointerPanel.activeSelf) PointerPanel.SetActive(true);
@@ -92,7 +112,12 @@ public class ControlManager : MonoBehaviour
                 if (GameManager.ENTITYMAP[mouseX, mouseY] == 2) output = "ROCK";
                 if (GameManager.ENTITYMAP[mouseX, mouseY] == 3) output = "CHERRY";
                 if (GameManager.ENTITYMAP[mouseX, mouseY] == 4) output = "COLA";
-                if (GameManager.ENTITYMAP[mouseX, mouseY] == 5) output = "GUMMYWORM";
+                if (GameManager.ENTITYMAP[mouseX, mouseY] == 5)
+                {
+                    RaycastHit2D hit = Physics2D.Raycast(new Vector2(mouseX, mouseY), Vector2.zero);
+                    GameObject gWorm = hit.transform.gameObject;
+                    output = "GUMMYWORM " + gWorm.GetComponent<WormSegmentController>().parentObject.GetComponent<WormMotor>().Health.ToString();
+                }
                 if (GameManager.ENTITYMAP[mouseX, mouseY] == 6) output = "GUMMYBEAR";
                 if (GameManager.VISIBLE[mouseX, mouseY] == 0) output = "FOG";
 
@@ -104,7 +129,7 @@ public class ControlManager : MonoBehaviour
                 {
                     float moveRange = Vector2.Distance(new Vector2(Selected.transform.position.x, Selected.transform.position.y), new Vector2(mouseX, mouseY));
                     if (GameManager.ENTITYMAP[mouseX, mouseY] != 2 && GameManager.ENTITYMAP[mouseX, mouseY] != 5 && GameManager.ENTITYMAP[mouseX, mouseY] != 6 
-                        && moveRange <= Selected.GetComponent<GummyBear>().Speed && ((moveRange*2)+Selected.GetComponent<GummyBear>().Fatigue) <= Selected.GetComponent<GummyBear>().ActionPoints)
+                        && moveRange <= Selected.GetComponent<GummyBear>().Speed && ((moveRange*2)+Selected.GetComponent<GummyBear>().Fatigue) <= Selected.GetComponent<GummyBear>().ActionPoints && GameManager.VISIBLE[mouseX, mouseY] == 1)
                     {
                         validIco.transform.position = new Vector2(mouseX, mouseY);
                         invalidIco.transform.position = new Vector2(-100, -100);
@@ -120,11 +145,8 @@ public class ControlManager : MonoBehaviour
 
                 if(attackMode)//for Attacking
                 {
-                    Debug.Log(Selected.transform.position);
-                    Debug.Log(new Vector2(mouseX, mouseY));
-                    Debug.Log(GameManager.ENTITYMAP[mouseX, mouseY]);
                     float attackRange = Vector2.Distance(new Vector2(Selected.transform.position.x, Selected.transform.position.y), new Vector2(mouseX, mouseY));
-                    if (GameManager.ENTITYMAP[mouseX, mouseY] == 5 && Selected.GetComponent<GummyBear>().Fatigue+2 <= Selected.GetComponent<GummyBear>().ActionPoints) //if square is visible and is a worm
+                    if (GameManager.ENTITYMAP[mouseX, mouseY] == 5 && Selected.GetComponent<GummyBear>().Fatigue+2 <= Selected.GetComponent<GummyBear>().ActionPoints && GameManager.VISIBLE[mouseX,mouseY] == 1) //if square is visible and is a worm
                     {
                         validIco.transform.position = new Vector2(mouseX, mouseY);
                         invalidIco.transform.position = new Vector2(-100, -100);
@@ -150,7 +172,6 @@ public class ControlManager : MonoBehaviour
                     Selected = hit.transform.gameObject;
                     if (SelectedGO != null) SelectedGO.transform.position = new Vector2(mouseX, mouseY);
                     if (SelectedGO == null) SelectedGO = Instantiate(BracketGO, new Vector2(mouseX, mouseY), Quaternion.identity);
-                    Debug.Log("Selected: " + Selected);
                     if (!GummyBearPanel.activeSelf) GummyBearPanel.SetActive(true);
                     UpdateGummyPanel();
                 }
@@ -168,6 +189,7 @@ public class ControlManager : MonoBehaviour
                     SelectedGO.transform.position = new Vector2(mouseX, mouseY);
                     GameManager.ENTITYMAP[(int)Selected.transform.position.x, (int)Selected.transform.position.y] = 6;
                     moveMode = false;
+                    Camera.main.GetComponent<CameraControl>().MoveCamera2Point(mouseX, mouseY);
                     UpdateGummyPanel();
                 }
 
@@ -179,8 +201,12 @@ public class ControlManager : MonoBehaviour
                     target = hit.transform.gameObject; target.GetComponent<Animator>().SetBool("Hurt", true);
                     target = target.GetComponent<WormSegmentController>().parentObject;
                     target.GetComponent<WormMotor>().Health += -10;
-                    if (target.GetComponent<WormMotor>().Health <= 0) Destroy(target);
+                    if (target.GetComponent<WormMotor>().Health <= 0)
+                    {
+                        target.GetComponent<WormMotor>().KillWorm();
+                    }
                     target = null;
+                    Camera.main.GetComponent<CameraControl>().MoveCamera2Point(mouseX, mouseY);
                     UpdateGummyPanel();
                 }
 
@@ -238,4 +264,49 @@ public class ControlManager : MonoBehaviour
         attackMode = !attackMode;
     }
 
+    public void ActivateHelpScreen()
+    {
+        HelpPanelObject.SetActive(!HelpPanelObject.activeSelf);
+    }
+
+    public void KilledAGummyWorm()
+    {
+        KilledTheWormPanel.SetActive(true);
+        PLAYERHASCONTROL = false;
+    }
+
+    public void ToggleQuitScreen()
+    {
+        QuitScreenPanel.SetActive(!QuitScreenPanel.activeSelf);
+    }
+
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
+
+    public void SelectBearLeft()
+    {
+        GameManager.GAME.GummyBearIndex--;
+        if (GameManager.GAME.GummyBearIndex < 0) GameManager.GAME.GummyBearIndex = GameManager.GAME.GummyBearList.Count-1;
+        Selected = GameManager.GAME.GummyBearList[GameManager.GAME.GummyBearIndex];
+        int selectedX = (int)GameManager.GAME.GummyBearList[GameManager.GAME.GummyBearIndex].transform.position.x, selectedY = (int)GameManager.GAME.GummyBearList[GameManager.GAME.GummyBearIndex].transform.position.y;
+        if (SelectedGO != null) SelectedGO.transform.position = new Vector2(selectedX, selectedY);
+        if (SelectedGO == null) SelectedGO = Instantiate(BracketGO, new Vector2(selectedX, selectedY), Quaternion.identity);
+        if (!GummyBearPanel.activeSelf) GummyBearPanel.SetActive(true);
+        Camera.main.GetComponent<CameraControl>().MoveCamera2Point(selectedX, selectedY);
+        UpdateGummyPanel();
+    }
+    public void SelectBearRight()
+    {
+        GameManager.GAME.GummyBearIndex++;
+        if (GameManager.GAME.GummyBearIndex > GameManager.GAME.GummyBearList.Count-1) GameManager.GAME.GummyBearIndex = 0;
+        Selected = GameManager.GAME.GummyBearList[GameManager.GAME.GummyBearIndex];
+        int selectedX = (int)GameManager.GAME.GummyBearList[GameManager.GAME.GummyBearIndex].transform.position.x, selectedY = (int)GameManager.GAME.GummyBearList[GameManager.GAME.GummyBearIndex].transform.position.y;
+        if (SelectedGO != null) SelectedGO.transform.position = new Vector2(selectedX, selectedY);
+        if (SelectedGO == null) SelectedGO = Instantiate(BracketGO, new Vector2(selectedX, selectedY), Quaternion.identity);
+        if (!GummyBearPanel.activeSelf) GummyBearPanel.SetActive(true);
+        Camera.main.GetComponent<CameraControl>().MoveCamera2Point(selectedX, selectedY);
+        UpdateGummyPanel();
+    }
 }
