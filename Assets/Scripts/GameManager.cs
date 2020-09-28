@@ -150,6 +150,7 @@ public class GameManager : MonoBehaviour
             GummyBearList.Add(bears[i]);
             bears[i].GetComponent<GummyBear>().number = i;
         }
+        Camera.main.GetComponent<CameraControl>().MoveCamera2Point((int)GummyBearList[0].transform.position.x, (int)GummyBearList[0].transform.position.y);
 
 
         MakeEntityMap();

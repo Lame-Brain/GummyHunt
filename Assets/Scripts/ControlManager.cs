@@ -282,7 +282,8 @@ public class ControlManager : MonoBehaviour
 
     public void QuitGame()
     {
-        Application.Quit();
+        Debug.Log("Quit Game");
+        Application.Quit();        
     }
 
     public void SelectBearLeft()
