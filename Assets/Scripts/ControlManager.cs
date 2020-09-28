@@ -93,7 +93,8 @@ public class ControlManager : MonoBehaviour
                 if (GameManager.ENTITYMAP[mouseX, mouseY] == 3) output = "CHERRY";
                 if (GameManager.ENTITYMAP[mouseX, mouseY] == 4) output = "COLA";
                 if (GameManager.ENTITYMAP[mouseX, mouseY] == 5) output = "GUMMYWORM";
-                if (GameManager.ENTITYMAP[mouseX, mouseY] == 6) output = "GUMMYBEAR";                
+                if (GameManager.ENTITYMAP[mouseX, mouseY] == 6) output = "GUMMYBEAR";
+                if (GameManager.VISIBLE[mouseX, mouseY] == 0) output = "FOG";
 
                 //Output to Text panel
                 PointerText.text = output;

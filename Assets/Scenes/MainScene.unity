@@ -1099,6 +1099,7 @@ MonoBehaviour:
     type: 3}
   wyrmPrefab: {fileID: 5923513542967976421, guid: 3f5b2a76bd97e4247b54640b6fc21a2d,
     type: 3}
+  fog: {fileID: 6765353902992859548, guid: e15c17a178166db4d888ab94cae5a0c2, type: 3}
   GummyPrefab:
   - {fileID: 753618541860854209, guid: 1cb28ad2e49e0d048b5a3e92d32788a8, type: 3}
   - {fileID: 7938082973790664100, guid: d93ab638feceff84cb4b258eb70a1991, type: 3}
@@ -1118,7 +1119,7 @@ MonoBehaviour:
   grassTrail: []
   colaTree: []
   cherryTree: []
-  mapSize: 102
+  mapSize: 63
   TrailObjectCache: 4000
   trailCount: 0
 --- !u!4 &538716948
@@ -2173,7 +2174,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1209993758
 RectTransform:
   m_ObjectHideFlags: 0

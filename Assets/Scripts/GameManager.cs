@@ -6,12 +6,12 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager GAME;
     public static ControlManager CONTROL;
-    public static int[,] ENTITYMAP;
-    public GameObject GrassPrefab, trailPrefab, RockPrefab, ColaPrefab, CherryPrefab, wyrmPrefab;
+    public static int[,] ENTITYMAP, VISIBLE;
+    public GameObject GrassPrefab, trailPrefab, RockPrefab, ColaPrefab, CherryPrefab, wyrmPrefab, fog;
     public GameObject[] GummyPrefab;
     public Sprite GrassFullGrowth, GrassHalfGrowth, GrassDead;
     [HideInInspector]
-    public GameObject[,] tileMap;
+    public GameObject[,] tileMap, fogMap;
     //[HideInInspector]
     public int[,] tileAssignment;
     [HideInInspector]
@@ -38,12 +38,26 @@ public class GameManager : MonoBehaviour
     {
         //Initialize Arrays
         ENTITYMAP = new int[mapSize, mapSize];
+        VISIBLE = new int[mapSize, mapSize];
         tileMap = new GameObject[mapSize, mapSize];
+        fogMap = new GameObject[mapSize, mapSize];
         tileAssignment = new int[mapSize, mapSize];
         trail = new GameObject[TrailObjectCache];
 
+        //Fill in the grass and the fog
+        for (int y = 0; y < mapSize; y++)
+        {
+            for (int x = 0; x < mapSize; x++)
+            {
+                tileMap[x, y] = Instantiate(GrassPrefab, new Vector2(x, y), Quaternion.identity);
+                tileAssignment[x, y] = 2;
+                fogMap[x, y] = Instantiate(fog, new Vector2(x, y), Quaternion.identity);
+                fogMap[x, y].SetActive(true);
+            }
+        }
+
         //Set Map Borders
-        for(int i = 0; i < mapSize; i++)
+        for (int i = 0; i < mapSize; i++)
         {
             tileMap[0, i] = Instantiate(RockPrefab, new Vector2(0, i), Quaternion.identity);
             tileMap[i, 0] = Instantiate(RockPrefab, new Vector2(i, 0), Quaternion.identity);
@@ -53,16 +67,6 @@ public class GameManager : MonoBehaviour
             tileAssignment[i, 0] = 1;
             tileAssignment[mapSize - 1, i] = 1;
             tileAssignment[i, mapSize - 1] = 1;
-        }
-
-        //Fill in the grass
-        for(int y = 1; y < mapSize-1; y++)
-        {
-            for(int x = 1; x < mapSize-1; x++)
-            {
-                tileMap[x, y] = Instantiate(GrassPrefab, new Vector2(x, y), Quaternion.identity);
-                tileAssignment[x, y] = 2;
-            }
         }
                 
         //place rocks 
@@ -92,22 +96,26 @@ public class GameManager : MonoBehaviour
         }
 
         //place Snake
-        bool foundSnakeSpot = false;
-        GameObject snek;
-        while (!foundSnakeSpot)
+        int R = Random.Range(1, 5);
+        for (int n = 0; n < R; n++)
         {
-            int snakeX = Random.Range(5, mapSize - 4), snakeY = Random.Range(5, mapSize - 5);
-            foundSnakeSpot = true;
-            for(int i = -1; i < 5; i++)
+            bool foundSnakeSpot = false;
+            GameObject snek;
+            while (!foundSnakeSpot)
             {
-                if (tileAssignment[snakeX+i,snakeY] != 2) foundSnakeSpot = false;
+                int snakeX = Random.Range(5, mapSize - 4), snakeY = Random.Range(5, mapSize - 5);
+                foundSnakeSpot = true;
+                for (int i = -1; i < 5; i++)
+                {
+                    if (tileAssignment[snakeX + i, snakeY] != 2) foundSnakeSpot = false;
+                }
+                if (foundSnakeSpot)
+                {
+                    snek = Instantiate(wyrmPrefab, new Vector2(0, 0), Quaternion.identity);
+                    snek.GetComponent<WormMotor>().BirthWorm(snakeX, snakeY); //replace 2,2 with snakeX and snakeY <--------------------------------------------------------------------------------------------------
+                }
+
             }
-            if (foundSnakeSpot)
-            {
-                snek = Instantiate(wyrmPrefab, new Vector2(0, 0), Quaternion.identity);                
-                snek.GetComponent<WormMotor>().BirthWorm(4, 4); //replace 2,2 with snakeX and snakeY <--------------------------------------------------------------------------------------------------
-            }
-            
         }
 
         //Fill Trail Cache
@@ -118,10 +126,22 @@ public class GameManager : MonoBehaviour
         }
 
         //place the Gummies
-        Instantiate(GummyPrefab[Random.Range(0, 12)], new Vector2(2, 2),Quaternion.identity);
-        Instantiate(GummyPrefab[Random.Range(0, 12)], new Vector2(4, 3), Quaternion.identity);
+        int leaderColor = Random.Range(0, 7), gX = 2, gY = 2;
+        bool validSpot;
+        for (int n = 0; n < 5; n++)
+        {
+            validSpot = false;
+            while (!validSpot)
+            {
+                gX = Random.Range(1, 11);
+                gY = Random.Range(1, 11);
+                if (tileAssignment[gX, gY] == 2) { validSpot = true; tileAssignment[gX, gY] = 5; }
+            }
+            Instantiate(GummyPrefab[leaderColor + n], new Vector2(gX, gY), Quaternion.identity);
+        }
 
         MakeEntityMap();
+        SetVisibleMap();
     }
 
     // Update is called once per frame
@@ -132,6 +152,41 @@ public class GameManager : MonoBehaviour
         {
             counter = 0;
             //PassTurn();
+        }
+    }
+
+    public void SetVisibleMap()
+    {
+        //Set all map spaces to blank
+        for (int y = 0; y < mapSize; y++)
+        {
+            for(int x = 0; x < mapSize; x++)
+            {
+                fogMap[x, y].SetActive(true);
+                VISIBLE[x, y] = 0;
+            }
+        }
+        //Find all gummybears
+        GameObject[] bears = GameObject.FindGameObjectsWithTag("Player");
+        Vector2 pointA, pointB;
+        foreach (GameObject b in bears)
+        {
+            for(int y = -6; y < 6; y++)
+            {
+                for (int x = -6; x < 6; x++)
+                {
+                    if (b.transform.position.x + x >= 0 && b.transform.position.x + x < mapSize && b.transform.position.y + y >= 0 && b.transform.position.y + y < mapSize)
+                    {
+                        pointA = new Vector2(b.transform.position.x, b.transform.position.y);
+                        pointB = new Vector2(b.transform.position.x + x, b.transform.position.y + y);
+                        if(Vector2.Distance(pointA, pointB) <= 6)
+                        {
+                            fogMap[(int)b.transform.position.x + x, (int)b.transform.position.y + y].SetActive(false);
+                            VISIBLE[(int)b.transform.position.x + x, (int)b.transform.position.y + y] = 1;
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -168,24 +223,27 @@ public class GameManager : MonoBehaviour
         if (ControlManager.PLAYERHASCONTROL)
         {
             //Move Gummyworms
-            GameObject[] Snakes = GameObject.FindGameObjectsWithTag("Snake");
-            for (int i = 0; i < Snakes.Length; i++)
+            for (int n = 0; n < 4; n++)
             {
-                Snakes[i].GetComponent<WormMotor>().MoveWorm();
-
-                int x = (int)Snakes[i].GetComponent<WormMotor>().HeadPos().x, y = (int)Snakes[i].GetComponent<WormMotor>().HeadPos().y;
-                if (tileAssignment[x, y] == 2 || tileAssignment[x, y] == 3) //GummyWorm is moving over a tile with full growth
+                GameObject[] Snakes = GameObject.FindGameObjectsWithTag("Snake");
+                for (int i = 0; i < Snakes.Length; i++)
                 {
-                    tileAssignment[x, y] = 4;
-                    trail[trailCount].transform.position = Snakes[i].GetComponent<WormMotor>().HeadPos();
-                    trail[trailCount].GetComponent<SpriteRenderer>().sprite = GrassDead;
-                    trail[trailCount].GetComponent<SpriteRenderer>().enabled = true;
-                    trail[trailCount].GetComponent<TrailControl>().SetActive(true);
-                    trailCount++;
-                    if (trailCount > (TrailObjectCache - 1)) trailCount = 0;
-                    if (tileAssignment[x, y] == 3) //Gummyworm has eaten a powerup
-                    {
+                    Snakes[i].GetComponent<WormMotor>().MoveWorm();
 
+                    int x = (int)Snakes[i].GetComponent<WormMotor>().HeadPos().x, y = (int)Snakes[i].GetComponent<WormMotor>().HeadPos().y;
+                    if (tileAssignment[x, y] == 2 || tileAssignment[x, y] == 3) //GummyWorm is moving over a tile with full growth
+                    {
+                        tileAssignment[x, y] = 4;
+                        trail[trailCount].transform.position = Snakes[i].GetComponent<WormMotor>().HeadPos();
+                        trail[trailCount].GetComponent<SpriteRenderer>().sprite = GrassDead;
+                        trail[trailCount].GetComponent<SpriteRenderer>().enabled = true;
+                        trail[trailCount].GetComponent<TrailControl>().SetActive(true);
+                        trailCount++;
+                        if (trailCount > (TrailObjectCache - 1)) trailCount = 0;
+                        if (tileAssignment[x, y] == 3) //Gummyworm has eaten a powerup
+                        {
+
+                        }
                     }
                 }
             }
@@ -205,6 +263,8 @@ public class GameManager : MonoBehaviour
 
             // Make Entity Map
             MakeEntityMap();
+            // MAKE VISIBLE MAP
+            SetVisibleMap();
         }
     }
 
